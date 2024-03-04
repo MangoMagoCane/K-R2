@@ -40,7 +40,7 @@ void reverse(char s[], int i, int len)
     s[i] = s[len-i];
     s[len-i] = c;
 
-    if (i < len/2) {
+    if (i <= len/2) {
         reverse(s, ++i, len);
     }
 }

@@ -1,25 +1,44 @@
 #include <stdio.h>
-#include "getline.h"
+#include <stdlib.h>
+#include <string.h>
+#include "headers/wrlines.h"
 
-#define MAXLINE 100
+#define MAXLEN 100
 #define MAXLINES 100
 
-int main(void)
+enum errorcodes {
+    SUCCESS, INVLDCMDARG, TOOMANYARGS, NOINPUT
+};
+
+int main(int argc, char *argv[])
 {
-    int len;
-    int i = 0;
-    char line[MAXLINE];
-    char *lines[MAXLINES];
+    char *lineptr[MAXLINES];
+    int nlines;
+    int linesToPrint = 10;
 
-    while ((len = getline(line, MAXLINE)) > 0) {
-        lines[i++] = line; 
+    if (argc == 2) {
+        if ((linesToPrint = atoi(argv[1])) >= 0) {
+            printf("Error: not a positive unsigned int\n");
+            return INVLDCMDARG;
+        }
+        
+        linesToPrint *= -1;
+    } else if (argc > 2) {
+        printf("Error: too many command-line arguments");
+        return TOOMANYARGS;
     }
 
-    for (; i > 0; i--) {
-        printf("%s\n", *(*lines)++);
+    if ((nlines = readlines(lineptr, MAXLEN)) < 0) {
+        printf("error: no lines inputted");
+        return NOINPUT;
     }
 
+    for (int i = nlines-1; i >= 0 && linesToPrint > 0; i--, linesToPrint--) {
+        printf("%s\n", lineptr[i]);
+    }
+    while (--nlines > 0) {
+        afree(lineptr[nlines]);
+    }
 
+    return SUCCESS;
 }
-
-
