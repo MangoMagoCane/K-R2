@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "alloc.h": "c",
-        "wrlines.h": "c",
-        "string.h": "c"
-    }
-}

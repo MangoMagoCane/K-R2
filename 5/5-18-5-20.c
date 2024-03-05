@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include "headers/getchars.h"
+#include "../headers/getchars.h"
 
 #define MAXTOKEN 100
 
