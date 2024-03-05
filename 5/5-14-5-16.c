@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
-#include "headers/wrlines.h"
+#include "../headers/wrlines.h"
 
 #define MAXLINES 5000 /* max #lines to be sorted */
 

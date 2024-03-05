@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "headers/wrlines.h"
+#include "../headers/wrlines.h"
 
 #define MAXLEN 100
 #define MAXLINES 100

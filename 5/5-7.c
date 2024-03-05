@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "getline.h"
+#include "../headers/getline.h"
 
 #define MAXLINES 5000 /* max #lines to be sorted */
 #define MAXLENS 100000 /* max length of any input line */
