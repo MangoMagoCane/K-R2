@@ -26,10 +26,10 @@ int getwordnl(char *word, int lim);
 
 int main(void)
 {
+    int linenum;
     struct tnode *root;
     char word[MAXWORD];
     root = NULL;
-    int linenum;
 
     while (getwordnl(word, MAXWORD) != EOF) {
         if (word[0] == '\n') {
@@ -39,8 +39,8 @@ int main(void)
             root = addtree(root, word, linenum);
         }
     }
-
     treeprint(root);
+
     return 0;
 }
 
@@ -92,8 +92,8 @@ int *alloccount(int *count, int num)
     for (int i = 0; i < len; i++) {
         p[i] = count[i];
     }
-
     p[len] = num;
+
     return p;
 }
 
@@ -107,6 +107,7 @@ void treeprint(struct tnode *p)
         for (int i = 0; i < len; i++) {
             printf("%d ", p->count[i]);
         }
+
         printf("%s\n", p->word);
         treeprint(p->right);
     }
@@ -118,6 +119,7 @@ int getwordnl(char *word, int lim)
     int c, getch(void);
     void ungetch(int);
     char *w = word;
+  
     while (isspace(c = getch()) && c != '\n') {}
     if (c != EOF) {
         *w++ = c;
@@ -126,12 +128,14 @@ int getwordnl(char *word, int lim)
         *w = '\0';
         return c;
     }
-    for ( ; --lim > 0; w++) {
+
+    for (; --lim > 0; w++) {
         if (!isalnum(*w = getch())) {
             ungetch(*w);
             break;
         }
     }
+
     *w = '\0';
     return word[0];
 }
