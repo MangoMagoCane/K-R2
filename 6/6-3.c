@@ -1,3 +1,5 @@
+// TODO: fix bug where linenumbers for words aren't unique
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -24,10 +26,6 @@ typedef struct noisenode {
     struct noisenode *right;
 } noisenode;
 
-char *noisewords[] = {
-    "the", "a", "an", "and", "but", "for", "so", "yet"
-};
-
 treenode *addtree(treenode *, char *, int);
 void treeprint(treenode *);
 treenode *talloc(void);
@@ -37,6 +35,12 @@ int getwordnl(char *word, int lim);
 noisenode *addnoiseword(noisenode *p, char *word);
 void noisefree(noisenode *p, int printwords);
 int isnoiseword(char *word, noisenode *p);
+void printcountnode(countnode *p);
+
+
+char *noisewords[] = {
+    "the", "a", "an", "and", "but", "for", "so", "yet"
+};
 
 int main(void)
 {
@@ -61,7 +65,7 @@ int main(void)
 
     treeprint(root);
     printf("Total line number: %d\n", linenum);
-    noisefree(nwroot, 1);
+    noisefree(nwroot, 0);
     return 0;
 }
 
@@ -121,18 +125,23 @@ void treeprint(treenode *p)
         treeprint(p->left);
 
         printf("%s: ", p->word);
-        countnode *ptr = p->count;
-        while (ptr != NULL) {
-            printf("%i ", ptr->linenum);
-            countnode *tempfree = ptr;
-            ptr = ptr->next;
-            free(tempfree);
-        }
+        printcountnode(p->count);
         printf("\n");
 
         treeprint(p->right);
         free(p);
     }
+}
+
+void printcountnode(countnode *p) 
+{
+    if (p == NULL) {
+        return;
+    }
+
+    printcountnode(p->next);
+    printf("%i ", p->linenum);
+    free(p);
 }
 
 /* getword: get next word or character from input */
