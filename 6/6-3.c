@@ -6,20 +6,26 @@
 
 #define MAXWORD 100
 
-typedef struct cnode {
+typedef struct countnode {
     int linenum;
-    struct cnode *next;
+    struct countnode *next;
 } countnode;
 
-typedef struct tnode {
+typedef struct treenode {
     char *word;
     countnode *count;
-    struct tnode *left;
-    struct tnode *right;
+    struct treenode *left;
+    struct treenode *right;
 } treenode;
 
-char *noise_words[] = {
-    "the", "and"
+typedef struct noisenode {
+    char *word;
+    struct noisenode *left;
+    struct noisenode *right;
+} noisenode;
+
+char *noisewords[] = {
+    "the", "a", "an", "and", "but", "for", "so", "yet"
 };
 
 treenode *addtree(treenode *, char *, int);
@@ -28,6 +34,9 @@ treenode *talloc(void);
 char *strdupkr(char *);
 void appendcount(treenode *count, int num);
 int getwordnl(char *word, int lim);
+noisenode *addnoiseword(noisenode *p, char *word);
+void noisefree(noisenode *p, int printwords);
+int isnoiseword(char *word, noisenode *p);
 
 int main(void)
 {
@@ -35,17 +44,24 @@ int main(void)
     char word[MAXWORD];
     int linenum = 1;
 
+    noisenode *nwroot = NULL;
+    int nwlen = sizeof(noisewords) / sizeof(noisewords[0]);
+    for (int i = 0; i < nwlen; i++) {
+        nwroot = addnoiseword(nwroot, noisewords[i]);
+    }
+
     while (getwordnl(word, MAXWORD) != EOF) {
         if (word[0] == '\n') {
             linenum++;
         }
-        if (isalpha(word[0])) {
+        if (isalpha(word[0]) && isnoiseword(word, nwroot) == 0) {
             root = addtree(root, word, linenum);
         }
     }
 
     treeprint(root);
     printf("Total line number: %d\n", linenum);
+    noisefree(nwroot, 1);
     return 0;
 }
 
@@ -87,6 +103,7 @@ char *strdupkr(char *s)
     }
     return p;
 }
+
 
 void appendcount(treenode *p, int num) 
 {
@@ -142,4 +159,52 @@ int getwordnl(char *word, int lim)
     
     *w = '\0';
     return word[0];
+}
+
+
+noisenode *addnoiseword(noisenode *p, char *w) 
+{
+    int cond;
+
+    if (p == NULL) {
+        p = (noisenode *) malloc(sizeof(noisenode));
+        p->word = strdupkr(w);
+        p->left = p->right = NULL;
+    } else if ((cond = strcmp(w, p->word)) < 0) {
+        p->left = addnoiseword(p->left, w);
+    } else if (cond > 0) {
+        p->right = addnoiseword(p->right, w);
+    }
+
+    return p;
+}
+
+
+void noisefree(noisenode *p, int printwords) 
+{
+    if (p != NULL) {
+        noisefree(p->left, printwords);
+        if (printwords) {
+            printf("%s\n", p->word);
+        }
+        noisefree(p->right, printwords);
+        free(p);
+    }
+}
+
+int isnoiseword(char *word, noisenode *p)
+{
+    int retval = 1;
+    if (p == NULL) {
+        return 0;
+    } 
+
+    int cond = strcmp(word, p->word);
+    if (cond < 0) {
+        retval = isnoiseword(word, p->left);
+    } else if (cond > 0) {
+        retval = isnoiseword(word, p->right);
+    }
+
+    return retval;
 }
