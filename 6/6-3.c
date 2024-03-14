@@ -1,5 +1,3 @@
-// TODO: fix bug where linenumbers for words aren't unique
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -36,7 +34,6 @@ noisenode *addnoiseword(noisenode *p, char *word);
 void noisefree(noisenode *p, int printwords);
 int isnoiseword(char *word, noisenode *p);
 void printcountnode(countnode *p);
-
 
 char *noisewords[] = {
     "the", "a", "an", "and", "but", "for", "so", "yet"
@@ -97,22 +94,25 @@ treenode *talloc(void)
     return (treenode *) malloc(sizeof(treenode));
 }
 
-/* make a duplicate of s */
+/* strdupkr: make a duplicate of s */
 char *strdupkr(char *s) 
 {
-    char *p;
-    p = (char *) malloc(strlen(s)+1); /* +1 for '\0' */
+    char *p = (char *) malloc(strlen(s)+1); /* +1 for '\0' */
     if (p != NULL) {
         strcpy(p, s);
     }
+
     return p;
 }
 
-
+/* appendcount: prepend num to linkedlist in treenode p */
 void appendcount(treenode *p, int num) 
 {
+    if (p->count != NULL && p->count->linenum == num) {
+        return;
+    }
     countnode *buf = malloc(sizeof(countnode));
-    
+
     buf->linenum = num;
     buf->next = (p->count == NULL) ? NULL : p->count;
     p->count = buf;
@@ -123,25 +123,14 @@ void treeprint(treenode *p)
 {
     if (p != NULL) {
         treeprint(p->left);
-
         printf("%s: ", p->word);
+
         printcountnode(p->count);
         printf("\n");
-
+        
         treeprint(p->right);
         free(p);
     }
-}
-
-void printcountnode(countnode *p) 
-{
-    if (p == NULL) {
-        return;
-    }
-
-    printcountnode(p->next);
-    printf("%i ", p->linenum);
-    free(p);
 }
 
 /* getword: get next word or character from input */
@@ -170,7 +159,7 @@ int getwordnl(char *word, int lim)
     return word[0];
 }
 
-
+/* addnoiseword: add a node with w, at or below p */
 noisenode *addnoiseword(noisenode *p, char *w) 
 {
     int cond;
@@ -188,7 +177,7 @@ noisenode *addnoiseword(noisenode *p, char *w)
     return p;
 }
 
-
+/* noisefree: free p with printwords flag */
 void noisefree(noisenode *p, int printwords) 
 {
     if (p != NULL) {
@@ -201,6 +190,7 @@ void noisefree(noisenode *p, int printwords)
     }
 }
 
+/* isnoiseword: check if word is found in noisenode binary tree p */
 int isnoiseword(char *word, noisenode *p)
 {
     int retval = 1;
@@ -216,4 +206,16 @@ int isnoiseword(char *word, noisenode *p)
     }
 
     return retval;
+}
+
+/* printcountnode: print and free countnod linkedlist p */
+void printcountnode(countnode *p) 
+{
+    if (p == NULL) {
+        return;
+    }
+
+    printcountnode(p->next);
+    printf("%i ", p->linenum);
+    free(p);
 }
