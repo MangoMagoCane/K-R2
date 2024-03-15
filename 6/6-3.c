@@ -133,7 +133,7 @@ void treeprint(treenode *p)
     }
 }
 
-/* getword: get next word or character from input */
+/* getwordnl: get next word or character from input */
 int getwordnl(char *word, int lim)
 {
     int c, getch(void);
