@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "../headers/getchars.h"
+#include "../headers/memorydebug.h"
 
 #define MAXWORD 100
 
@@ -63,6 +64,7 @@ int main(void)
     treeprint(root);
     printf("Total line number: %d\n", linenum);
     noisefree(nwroot, 0);
+    mallocsfreed();
     return 0;
 }
 
@@ -129,6 +131,7 @@ void treeprint(treenode *p)
         printf("\n");
         
         treeprint(p->right);
+        free(p->word);
         free(p);
     }
 }
@@ -186,6 +189,7 @@ void noisefree(noisenode *p, int printwords)
             printf("%s\n", p->word);
         }
         noisefree(p->right, printwords);
+        free(p->word);
         free(p);
     }
 }
