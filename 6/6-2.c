@@ -1,3 +1,5 @@
+// TODO: everything, no clue how to approach this problem or what it's even asking
+
 #include <stdio.h>
 
 enum errorcodes {
