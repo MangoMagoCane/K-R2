@@ -1,27 +1,31 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int __malfree__ = 0;
+static int mallocs = 0;
+static int frees = 0;
 
 void *my_malloc(size_t size)
 {
     void *ptr = malloc(size);
-    __malfree__++;
+    mallocs++;
     return ptr;
 }
 
 void my_free(void *ptr)
 {
-    __malfree__--;
+    frees--;
     free(ptr);
 }
 
 char *my_strdup(char *s) {
-    __malfree__++;
+    mallocs++;
     return strdup(s);
 }
 
 #define malloc(x) my_malloc(x)
 #define free(x) my_free(x)
 #define strdup(x) my_strdup(x)
-#define mallocsfreed() printf("Unfreed mallocs: %d\n", __malfree__);
+
+#define mallocs() printf("mallocs: %d\n", mallocs);
+#define frees() printf("frees: %d\n", frees);
+#define mallocsfreed() printf("Unfreed mallocs: %d\n", mallocs - frees);
